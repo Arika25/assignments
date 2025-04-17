@@ -9,5 +9,15 @@ There is no automated test for this one, this is more for you to understand time
 */
 
 function calculateTime(n) {
-    return 0.01;
+    sum=0;
+    const now = new Date();
+    const beforetime = now.getTime();
+    for (i=0; i<n; i++) {
+        sum=sum+i
+    }
+    const now2 = new Date();
+    const aftertime = now2.getTime();
+    return aftertime-beforetime;
 }
+ans= calculateTime(100000000000)
+console.log(ans)

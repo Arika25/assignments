@@ -41,9 +41,136 @@
  */
   const express = require('express');
   const bodyParser = require('body-parser');
+  const fs = require('fs');
   
   const app = express();
   
-  app.use(bodyParser.json());
+  // app.use(bodyParser.json());
+  // function read(filename) {
+  //   fs.readFile(filename, 'utf8', function(err, data) {
+      
+  //     return(data)
+  //   })
+  // }
+
+  function read(filename) {
+      const data = fs.readFileSync(filename, 'utf8');
+      return JSON.parse(data);
+  }
+
+  function write(filename, data) {
+    fs.writeFileSync(filename, JSON.stringify(data, null, 2));
+  }
+
+  // var todos =read('todos.json')
+
+app.use(express.json());
+
+app.get('/todos', function(req, res) {
+  var todos =read('todos.json')
+  res.status(200).json(
+        todos
+    )
+})
+
+app.get('/todos/:id', function(req, res) {
+  const id = req.params.id;
+  ans = null
+  var todos =read('todos.json');
+  for (i=0; i<todos.length;i++) {
+    if(todos[i].id == id) {
+    ans= todos[i];
+  }
+  }
+  if(ans) {
+    res.status(200).json(
+      ans
+  )
+ } else {
+    res.status(404).json({
+        msg:"Not Found"
+    })
+  }  
+})
+
+app.post('/todos', function(req,res) {
+    const id = Math.floor(Math.random() * 1000000);
+    const title= req.body.title;
+    const completed= req.body.completed;
+    const description= req.body.description;
+    var todos =read('todos.json')
+    todos.push({
+      id: id,
+      title: title,
+      completed: completed,
+      description: description
+    }
+    )
+    write('todos.json', todos)
+    res.status(201).json({
+      id: id,
+      title: title,
+      completed: completed,
+      description: description
+    })
+})
+
+app.put('/todos/:id', function(req, res) {
+  const id = req.params.id;
+  var todos =read('todos.json')
+    if(todosFound(id,todos)) {
+    for (i=0; i<todos.length; i++) {
+        if(todos[i].id==id) {
+            todos[i].title= req.body.title;
+            todos[i].completed= req.body.completed;
+            todos[i].description= req.body.description;
+        }
+    }
+    write('todos.json', todos)
+    res.status(200).json({})
+} else {
+    res.status(404).json({
+        msg:"Not Found"
+    })
+}
+
+})
+
+app.delete('/todos/:id', function(req,res) {
+  const id = req.params.id;
+    const newtodos= [];
+    var todos =read('todos.json')
+    if(todosFound(id,todos)) {
+    for (i=0; i<todos.length; i++) {
+      if(todos[i].id!=id) {
+            newtodos.push({
+              id:todos[i].id,
+                title: todos[i].title,
+                completed: todos[i].completed,
+                description: todos[i].description
+            }) 
+    }}
+    todos = newtodos;
+    write('todos.json', todos)
+    res.status(200).json({msg:"done"})
+} else {
+    res.status(404).json({
+        msg:"Not found"
+    })
+}
+})
+
+function todosFound(id,todos) {
+    let todosfound= false;
+    for(i=0; i<todos.length; i++) {
+        if(todos[i].id==id) {
+            todosfound = true;
+        }
+    }
+    return todosfound
+
+}
   
   module.exports = app;
+
+//  app.listen(3000)

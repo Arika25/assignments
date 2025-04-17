@@ -4,7 +4,21 @@
 */
 
 function isPalindrome(str) {
-  return true;
+  strarray = str.toLowerCase().split('');
+  reversearray= [];
+  for(i=strarray.length-1;i>=0; i--) {
+    reversearray[strarray.length-i-1] = strarray[i];
+  }
+  reverse=reversearray.join('');
+  if(str.toLowerCase().replace(/[^\w]|_/g,'')==reverse.toLowerCase().replace(/[^\w]|_/g,'')) {
+    return true;
+  } else {
+    return false;
+  }
+  
 }
 
+// let str = "namaN"
+// ans = isPalindrome(str);
+// console.log(ans)
 module.exports = isPalindrome;
